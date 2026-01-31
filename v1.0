@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations Agent | AI-Enabled Operations Leader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --accent-cyan: #00d4ff;
+            --accent-orange: #ff6b35;
+            --accent-green: #00ff88;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888aa;
+            --border: #2a2a3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated grid background */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .agent-header {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-green);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .agent-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-subtitle {
+            font-size: 1.1rem;
+            color: var(--accent-orange);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .agent-tagline {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: var(--bg-card);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .chat-header-status {
+            font-size: 0.75rem;
+            color: var(--accent-green);
+        }
+
+        .chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-agent {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-user {
+            background: linear-gradient(135deg, var(--accent-cyan), #0099cc);
+            color: var(--bg-primary);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-typing {
+            display: flex;
+            gap: 4px;
+            padding: 1rem 1.25rem;
+        }
+
+        .message-typing span {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .message-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .message-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .quick-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            transform: scale(1.02);
+        }
+
+        /* Input */
+        .chat-input-container {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), #0099cc);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--bg-primary);
+        }
+
+        /* Skills Section */
+        .skills-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .skill-tag.highlight {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Footer */
+        .agent-footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .agent-footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .agent-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    
+    <div class="container">
+        <header class="agent-header">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                AGENT ONLINE
+            </div>
+            <h1 class="agent-title">Ops.Agent</h1>
+            <p class="agent-subtitle">AI-Enabled Operations Transformation Leader</p>
+            <p class="agent-tagline">8+ years logistics leadership × Six Sigma Black Belt × AI automation architect. I eliminate inefficiency—and the middle management that perpetuates it.</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">8+</div>
+                <div class="stat-label">Years Logistics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">60+</div>
+                <div class="stat-label">CDL Drivers Led</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$8M</div>
+                <div class="stat-label">Budget Managed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">90%</div>
+                <div class="stat-label">OT Reduction</div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <span class="chat-header-title">// INTERACTIVE AGENT</span>
+                <span class="chat-header-status">● Ready</span>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message message-agent">
+                    Welcome. I represent an AI-enabled Operations Transformation Leader—here to answer questions about experience, capabilities, and what this candidate brings to senior operations roles. What would you like to know?
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="askQuestion('experience')">Experience Overview</button>
+                <button class="quick-btn" onclick="askQuestion('ai')">AI Capabilities</button>
+                <button class="quick-btn" onclick="askQuestion('results')">Key Results</button>
+                <button class="quick-btn" onclick="askQuestion('sixsigma')">Six Sigma</button>
+                <button class="quick-btn" onclick="askQuestion('contact')">Contact</button>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="skills-section">
+            <h3 class="section-title">Core Capabilities</h3>
+            <div class="skills-tags">
+                <span class="skill-tag highlight">Multi-Agent Workflows</span>
+                <span class="skill-tag highlight">Local LLM Deployment</span>
+                <span class="skill-tag highlight">Process Automation</span>
+                <span class="skill-tag">Fleet Management</span>
+                <span class="skill-tag">WMS/TMS Systems</span>
+                <span class="skill-tag">P&L Management</span>
+                <span class="skill-tag">Six Sigma DMAIC</span>
+                <span class="skill-tag">Driver Operations</span>
+                <span class="skill-tag">Cost Optimization</span>
+                <span class="skill-tag">Predictive Analytics</span>
+            </div>
+        </div>
+
+        <footer class="agent-footer">
+            <p>Built with purpose. Powered by ambition.</p>
+            <p style="margin-top: 0.5rem;">Target: Director-Level Operations | $120K+ | March 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        const knowledgeBase = {
+            experience: `This candidate brings 8+ years of logistics and supply chain leadership, currently managing 60+ CDL drivers and $6-8M operating budgets at regional facilities handling multi-million pound daily freight volumes. Experience spans warehouse operations, fleet management, transportation logistics, and operational transformation.`,
+            
+            ai: `This candidate is building real AI capabilities—not just taking courses. They've deployed local LLM labs, built multi-agent automation workflows, and created tools like weather forecasting applications and regional logistics optimization systems. Pursuing 6-12 AI certifications annually through 2035, positioning to implement AI solutions, not just understand them.`,
+            
+            results: `Recent wins include: 90% overtime reduction saving $36-40K annually, stabilizing a 70-driver operation in 8 weeks, building automated dispatch documentation, and creating real-time visibility dashboards. The approach combines Six Sigma methodology with AI-powered analysis to find optimization opportunities others miss.`,
+            
+            sixsigma: `Six Sigma Green Belt certified, currently pursuing Black Belt certification. Applies DMAIC methodology to logistics operations, using data-driven approaches for root cause analysis and process improvement. Combining Six Sigma frameworks with AI tools to automate pattern recognition and predictive analysis.`,
+            
+            contact: `This candidate is actively pursuing Director-level operations roles targeting $120K+ compensation. Open to conversations about opportunities where AI-enabled operations transformation is valued.\n\n📧 Email: thisemail@gmail.com\n📞 Phone: 202-555-1213\n\nSerious inquiries only.`,
+            
+            vision: `Core thesis: The future of operations leadership isn't managing people—it's architecting systems that eliminate the need for middle management. This candidate is positioning to be the leader who implements that transformation, not the one displaced by it.`,
+            
+            why: `Why this candidate? Three reasons: 1) Already building AI tools, not just studying them. 2) Eight years of operational credibility means knowing what actually works on a dock floor. 3) Combines process discipline (Six Sigma) with emerging tech capability—a rare combination in logistics leadership.`,
+            
+            default: `I can tell you about this candidate's experience, AI capabilities, key results, Six Sigma background, or how to connect. What interests you most?`
+        };
+
+        function askQuestion(topic) {
+            const questions = {
+                experience: "Tell me about this candidate's experience",
+                ai: "What are the AI capabilities?",
+                results: "What results has he delivered?",
+                sixsigma: "Tell me about the Six Sigma background",
+                contact: "How can I connect?"
+            };
+            
+            addMessage(questions[topic], 'user');
+            setTimeout(() => {
+                addMessage(knowledgeBase[topic], 'agent');
+            }, 800);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message message-agent message-typing';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            setTimeout(() => {
+                document.getElementById('typing').remove();
+                const response = getResponse(message.toLowerCase());
+                addMessage(response, 'agent');
+            }, 1000);
+        }
+
+        function getResponse(message) {
+            if (message.includes('experience') || message.includes('background') || message.includes('history')) {
+                return knowledgeBase.experience;
+            } else if (message.includes('ai') || message.includes('automation') || message.includes('llm') || message.includes('agent')) {
+                return knowledgeBase.ai;
+            } else if (message.includes('result') || message.includes('achieve') || message.includes('accomplish') || message.includes('win')) {
+                return knowledgeBase.results;
+            } else if (message.includes('sigma') || message.includes('process') || message.includes('methodology')) {
+                return knowledgeBase.sixsigma;
+            } else if (message.includes('contact') || message.includes('reach') || message.includes('connect') || message.includes('hire')) {
+                return knowledgeBase.contact;
+            } else if (message.includes('vision') || message.includes('future') || message.includes('goal')) {
+                return knowledgeBase.vision;
+            } else if (message.includes('why') || message.includes('different') || message.includes('unique')) {
+                return knowledgeBase.why;
+            } else {
+                return knowledgeBase.default;
+            }
+        }
+
+        function addMessage(text, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
